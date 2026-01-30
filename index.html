@@ -2,56 +2,206 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Счётчик для Genially</title>
+<title>Редактор счётчика баллов для Genially</title>
+
 <style>
-body { font-family: Segoe UI, sans-serif; padding: 20px; background:#f0f2f5; }
-.widget {
-    display:inline-flex;
-    align-items:center;
-    background:#ffffff;
-    color:#333;
-    border-radius:50px;
-    padding:10px 20px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.1);
-    font-family:Montserrat, sans-serif;
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background:#f0f2f5;
+    padding:20px;
+    display:flex;
+    gap:30px;
 }
-.widget button {
-    margin-left:15px;
-    width:30px;
-    height:30px;
+
+.editor {
+    width:380px;
+    background:#fff;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+
+.preview-zone {
+    flex:1;
+    background:#ddd;
+    border-radius:15px;
+    border:2px dashed #bbb;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.field {
+    margin-bottom:15px;
+}
+
+label {
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:5px;
+}
+
+input[type="text"],
+input[type="range"],
+input[type="color"] {
+    width:100%;
+}
+
+h2 {
+    margin-top:0;
+    color:#1a73e8;
+}
+
+button {
+    width:100%;
+    padding:12px;
     border:none;
-    border-radius:50%;
+    border-radius:8px;
     cursor:pointer;
-    font-size:20px;
     font-weight:bold;
-    background:rgba(0,0,0,0.1);
+}
+
+.copy-btn {
+    background:#28a745;
+    color:#fff;
+    margin-top:10px;
+}
+
+.reset-btn {
+    background:#6c757d;
+    color:#fff;
+    margin-top:8px;
 }
 </style>
 </head>
+
 <body>
 
-<div class="widget">
-    <span style="font-size:24px;margin-right:10px;">⭐</span>
-    <span style="font-size:18px;font-weight:bold;">
-        Artifacts: <span id="score_val">0</span>
-    </span>
-    <button onclick="addScore()">+</button>
+<div class="editor">
+    <h2>Счётчик баллов</h2>
+
+    <div class="field">
+        <label>Название (что собираем)</label>
+        <input type="text" id="labelInput" value="Баллы" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Ссылка на иконку (необязательно)</label>
+        <input type="text" id="iconInput" placeholder="https://..." oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Размер иконки: <span id="iconSizeVal">24</span> px</label>
+        <input type="range" id="iconSize" min="10" max="100" value="24" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Размер текста: <span id="fontSizeVal">18</span> px</label>
+        <input type="range" id="fontSize" min="10" max="50" value="18" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Цвет фона</label>
+        <input type="color" id="bgColor" value="#ffffff" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Цвет текста</label>
+        <input type="color" id="textColor" value="#333333" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Шрифт (из Genially)</label>
+        <input type="text" id="fontInput" value="Montserrat" oninput="update()">
+    </div>
+
+    <button class="copy-btn" onclick="copyCode()">📋 Копировать код для Genially</button>
+    <button class="reset-btn" onclick="location.reload()">Сбросить настройки</button>
+</div>
+
+<div class="preview-zone">
+    <h3 style="color:#666;">Предпросмотр</h3>
+    <div id="preview"></div>
 </div>
 
 <script>
-/* 🔑 ОДИН ключ на всю презентацию */
-const STORAGE_KEY = 'genially_global_score';
+function update() {
 
-/* загрузка значения */
-let score = parseInt(localStorage.getItem(STORAGE_KEY)) || 0;
+    const label = labelInput.value;
+    const iconUrl = iconInput.value;
+    const iconSize = iconSize.value;
+    const fontSize = fontSize.value;
+    const bg = bgColor.value;
+    const text = textColor.value;
+    const font = fontInput.value;
+
+    iconSizeVal.innerText = iconSize;
+    fontSizeVal.innerText = fontSize;
+
+    const icon = iconUrl
+        ? `<img src="${iconUrl}" style="width:${iconSize}px;margin-right:10px;">`
+        : `<span style="font-size:${iconSize}px;margin-right:10px;">🏆</span>`;
+
+    const widget = `
+<div style="
+    display:inline-flex;
+    align-items:center;
+    background:${bg};
+    color:${text};
+    border-radius:50px;
+    padding:10px 20px;
+    font-family:'${font}',sans-serif;
+    box-shadow:0 4px 15px rgba(0,0,0,.1);">
+
+    ${icon}
+
+    <span style="font-size:${fontSize}px;font-weight:bold;">
+        ${label}: <span id="score_val">0</span>
+    </span>
+
+    <button onclick="addScore()" style="
+        margin-left:15px;
+        width:30px;
+        height:30px;
+        border:none;
+        border-radius:50%;
+        font-size:20px;
+        font-weight:bold;
+        cursor:pointer;
+        background:rgba(0,0,0,.1);
+        color:${text};">+</button>
+</div>
+
+<script>
+const KEY = 'genially_global_score';
+let score = parseInt(localStorage.getItem(KEY)) || 0;
 document.getElementById('score_val').innerText = score;
 
-/* кнопка + */
 function addScore() {
     score++;
-    localStorage.setItem(STORAGE_KEY, score);
+    localStorage.setItem(KEY, score);
     document.getElementById('score_val').innerText = score;
 }
+<\/script>
+`;
+
+    preview.innerHTML = widget;
+    window.geniallyCode = widget;
+}
+
+function copyCode() {
+    const t = document.createElement('textarea');
+    t.value = window.geniallyCode;
+    document.body.appendChild(t);
+    t.select();
+    document.execCommand('copy');
+    document.body.removeChild(t);
+    alert('Код скопирован. Вставь его в Genially → Insert → Others');
+}
+
+update();
 </script>
 
 </body>
