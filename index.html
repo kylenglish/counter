@@ -46,10 +46,9 @@
             <option value="Arial, sans-serif">Arial (Стандартный)</option>
             <option value="'Montserrat', sans-serif">Montserrat (Genially)</option>
             <option value="'Roboto', sans-serif">Roboto</option>
-            <option value="'Courier New', monospace">Courier New (Печатная машинка)</option>
-            <option value="Georgia, serif">Georgia (С засечками)</option>
-            <option value="'Comic Sans MS', cursive">Comic Sans (Игровой)</option>
-            <option value="'Verdana', sans-serif">Verdana</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Comic Sans MS', cursive">Comic Sans</option>
         </select>
     </div>
 
@@ -59,7 +58,7 @@
     </div>
 
     <div class="field">
-        <label>Цвет текста</label>
+        <label>Цвет текста и кнопок</label>
         <input type="color" id="textColor" value="#333333" oninput="update()">
     </div>
 
@@ -92,8 +91,15 @@ function update() {
 <div id="wrapper" style="display: inline-block; user-select: none; vertical-align: middle;">
     <div style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: ${font}; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.2);">
         ${iconHtml}
-        <span style="font-size: ${fSize}px; font-weight: bold; vertical-align: middle; line-height: 1;">${label}: <span id="count">0</span></span>
-        <div id="plus_btn" style="margin-left:15px; background:${text}; color:${bg}; border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1; transition: transform 0.1s;">+</div>
+        <span style="font-size: ${fSize}px; font-weight: bold; vertical-align: middle; line-height: 1; margin-right: 15px;">
+            ${label}: <span id="count">0</span>
+        </span>
+        
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div id="minus_btn" style="background:${text}22; color:${text}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">−</div>
+            <div id="plus_btn" style="background:${text}; color:${bg}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">+</div>
+            <div id="reset_btn" style="margin-left:5px; cursor:pointer; opacity: 0.6; font-size: 18px;" title="Сбросить">🗑️</div>
+        </div>
     </div>
 </div>
 
@@ -101,20 +107,45 @@ function update() {
 (function() {
     const key = 'genially_val_sum';
     const display = document.getElementById('count');
-    const btn = document.getElementById('plus_btn');
+    const bPlus = document.getElementById('plus_btn');
+    const bMinus = document.getElementById('minus_btn');
+    const bReset = document.getElementById('reset_btn');
     
     function refresh() {
         display.innerText = localStorage.getItem(key) || '0';
     }
     
-    btn.onclick = function(e) {
+    function animate(el) {
+        el.style.transform = 'scale(1.2)';
+        setTimeout(() => el.style.transform = 'scale(1)', 100);
+    }
+
+    bPlus.onclick = function(e) {
         e.stopPropagation();
         let val = parseInt(localStorage.getItem(key)) || 0;
         val++;
         localStorage.setItem(key, val);
         refresh();
-        btn.style.transform = 'scale(1.2)';
-        setTimeout(() => btn.style.transform = 'scale(1)', 100);
+        animate(bPlus);
+    };
+
+    bMinus.onclick = function(e) {
+        e.stopPropagation();
+        let val = parseInt(localStorage.getItem(key)) || 0;
+        if (val > 0) {
+            val--;
+            localStorage.setItem(key, val);
+            refresh();
+            animate(bMinus);
+        }
+    };
+
+    bReset.onclick = function(e) {
+        e.stopPropagation();
+        if (confirm('Обнулить результат?')) {
+            localStorage.setItem(key, 0);
+            refresh();
+        }
     };
     
     refresh();
