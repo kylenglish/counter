@@ -5,17 +5,17 @@
     <title>Редактор виджета "Счетчик баллов"</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; gap: 20px; background: #f0f2f5; }
-        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 420px; height: fit-content; }
+        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 440px; height: fit-content; }
         .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e0e0e0; border: 2px dashed #bbb; border-radius: 12px; min-height: 500px; }
         .field { margin-bottom: 15px; }
         label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #444; }
         input[type="text"], input[type="range"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; background: none; }
-        .hint { font-size: 11px; color: #d93025; font-weight: bold; line-height: 1.4; display: block; margin-top: 4px; }
+        .hint { font-size: 11px; color: #555; font-weight: normal; line-height: 1.5; display: block; margin-top: 6px; background: #e8f0fe; padding: 8px; border-radius: 6px; border-left: 4px solid #1a73e8; }
         .copy-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
         h2 { font-size: 20px; margin-top: 0; color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bitter&family=Caveat&family=Comfortaa:wght@300..700&family=Marck+Script&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Stalinist+One&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bitter&family=Caveat&family=Comfortaa:wght@400;700&family=Marck+Script&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Stalinist+One&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -23,13 +23,16 @@
     <h2>Редактор виджета "Счетчик баллов"</h2>
     
     <div class="field">
-        <label style="color: #1a73e8;">Код (ID) презентации (опционально)</label>
+        <label>Код (ID) презентации (опционально, ничего не вводите, если не нужно)</label>
         <input type="text" id="idInput" value="lesson_1" oninput="update()">
-        <span class="hint">⚠️ Смените это слово (например, на 'lesson_2'), чтобы в новой презентации счет начался с нуля!</span>
+        <span class="hint">
+            Придумайте кодовое слово (напр. 'test1'), если хотите использовать настроенный счетчик сразу в разных презентациях. 
+            <b>Инструкция:</b> сначала копируете код для одной презентации, возвращаетесь в редактор, вводите новое кодовое слово и копируете код для другой презентации.
+        </span>
     </div>
 
     <div class="field">
-        <label>Что собираем (звездочки, рокеты, сердечки и т.п.)</label>
+        <label>Что собираем (звездочки, рокеты и т.п.)? Введи своё название</label>
         <input type="text" id="labelInput" value="Points" oninput="update()">
     </div>
 
@@ -40,17 +43,17 @@
 
     <div class="field" style="display:flex; gap:10px;">
         <div style="flex:1">
-            <label>Иконка: <span id="iconSizeVal">24</span>px</label>
+            <label>Размер иконки: <span id="iconSizeVal">24</span>px</label>
             <input type="range" id="iconSize" min="15" max="80" value="24" oninput="update()">
         </div>
         <div style="flex:1">
-            <label>Текст: <span id="fontSizeVal">18</span>px</label>
+            <label>Размер текста: <span id="fontSizeVal">18</span>px</label>
             <input type="range" id="fontSize" min="12" max="40" value="18" oninput="update()">
         </div>
     </div>
 
     <div class="field">
-        <label>Выбор шрифта (из Genially)</label>
+        <label>Выбор шрифта</label>
         <select id="fontSelect" onchange="update()">
             <option value="'Roboto', sans-serif">Roboto</option>
             <option value="'Open Sans', sans-serif">Open Sans</option>
@@ -88,8 +91,8 @@
 
 <script>
 function update() {
-    // Очищаем ID от всего, кроме латиницы и цифр
-    const lessonID = document.getElementById('idInput').value.replace(/[^a-z0-9]/gi, '') || 'default';
+    const rawID = document.getElementById('idInput').value;
+    const lessonID = rawID.replace(/[^a-z0-9]/gi, '') || 'default';
     const label = document.getElementById('labelInput').value;
     const iconUrl = document.getElementById('iconInput').value;
     const iSize = document.getElementById('iconSize').value;
@@ -107,11 +110,11 @@ function update() {
 
     const finalCode = `
 <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bitter&family=Caveat&family=Comfortaa&family=Marck+Script&family=Montserrat&family=Open+Sans&family=Playfair+Display&family=Raleway&family=Roboto&family=Stalinist+One&family=Ubuntu&display=swap" rel="stylesheet">
-<div id="wrapper_${lessonID}" style="display: inline-block; user-select: none; vertical-align: middle;">
+<div id="w_${lessonID}" style="display: inline-block; user-select: none; vertical-align: middle;">
     <div style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: ${font}; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.2);">
         ${iconHtml}
         <span style="font-size: ${fSize}px; font-weight: bold; vertical-align: middle; line-height: 1; margin-right: 15px;">
-            ${label}: <span id="val_${lessonID}">0</span>
+            ${label}: <span id="c_${lessonID}">0</span>
         </span>
         <div style="display: flex; gap: 8px; align-items: center;">
             <div id="m_${lessonID}" style="background:${text}22; color:${text}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">−</div>
@@ -123,38 +126,40 @@ function update() {
 
 <script>
 (function() {
-    const key = 'score_key_${lessonID}';
-    const display = document.getElementById('val_${lessonID}');
+    const key = 'gen_storage_${lessonID}';
+    const display = document.getElementById('c_${lessonID}');
     
-    const refresh = () => {
+    function refresh() {
         display.innerText = localStorage.getItem(key) || '0';
-    };
+    }
     
-    document.getElementById('p_${lessonID}').onclick = (e) => {
+    document.getElementById('p_${lessonID}').onclick = function(e) {
         e.stopPropagation();
-        let v = parseInt(localStorage.getItem(key)) || 0;
-        localStorage.setItem(key, v + 1);
+        let val = parseInt(localStorage.getItem(key)) || 0;
+        localStorage.setItem(key, val + 1);
         refresh();
     };
 
-    document.getElementById('m_${lessonID}').onclick = (e) => {
+    document.getElementById('m_${lessonID}').onclick = function(e) {
         e.stopPropagation();
-        let v = parseInt(localStorage.getItem(key)) || 0;
-        if (v > 0) localStorage.setItem(key, v - 1);
-        refresh();
+        let val = parseInt(localStorage.getItem(key)) || 0;
+        if (val > 0) {
+            localStorage.setItem(key, val - 1);
+            refresh();
+        }
     };
 
-    document.getElementById('r_${lessonID}').onclick = (e) => {
+    document.getElementById('r_${lessonID}').onclick = function(e) {
         e.stopPropagation();
-        if (confirm('Сбросить баллы для этого ID?')) {
+        if (confirm('Обнулить результат?')) {
             localStorage.setItem(key, 0);
             refresh();
         }
     };
     
     refresh();
-    window.addEventListener('storage', (e) => { if(e.key === key) refresh(); });
-    setTimeout(refresh, 400);
+    window.addEventListener('storage', refresh);
+    setTimeout(refresh, 300);
 })();
 <\/script>`;
 
@@ -169,7 +174,7 @@ function copyCode() {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    alert('Код скопирован! Убедитесь, что ID для новой презентации уникален.');
+    alert('Код скопирован! Теперь вставьте его в Genially.');
 }
 
 update();
