@@ -12,7 +12,6 @@
         input[type="text"], input[type="range"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; background: none; }
         
-        /* Стилизация инструкции */
         .hint { font-size: 11px; color: #444; font-weight: normal; line-height: 1.6; display: block; margin-top: 8px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e1e4e8; }
         .hint-title { font-weight: bold; color: #1a73e8; display: block; margin-bottom: 4px; }
         .hint-step { display: block; padding-left: 10px; position: relative; }
@@ -20,6 +19,15 @@
         
         .copy-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
         h2 { font-size: 20px; margin-top: 0; color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
+
+        /* Стили модального окна (как на скрине) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #12151e; color: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
+        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: white; text-transform: uppercase; letter-spacing: 1px; }
+        #modalCode { width: 100%; height: 200px; background: #1c212e; color: #a5b4fc; border: 1px solid #333c4d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; resize: none; margin-bottom: 15px; }
+        .modal-close { background: #3b82f6; color: white; border: none; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold; display: block; margin: 0 auto; transition: 0.3s; }
+        .modal-close:hover { background: #2563eb; }
+        .modal-hint { font-size: 12px; color: #8e99af; margin-bottom: 10px; display: block; text-align: center; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bitter&family=Caveat&family=Comfortaa:wght@400;700&family=Marck+Script&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Stalinist+One&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -92,12 +100,21 @@
         </div>
     </div>
 
-    <button onclick="copyCode()" class="copy-btn">📋 Копировать код для Genially</button>
+    <button onclick="openModal()" class="copy-btn">📋 Получить код для Genially</button>
 </div>
 
 <div class="preview-zone">
     <h3 style="color: #666;">Предпросмотр:</h3>
     <div id="preview-container"></div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">Готовый HTML</div>
+        <span class="modal-hint">Скопируй код целиком и вставь в Insert -> Others в Genially.</span>
+        <textarea id="modalCode" readonly onclick="this.select()"></textarea>
+        <button class="modal-close" onclick="closeModal()">ПОНЯТНО / ОК</button>
+    </div>
 </div>
 
 <script>
@@ -139,35 +156,22 @@ function update() {
 (function() {
     const key = 'gen_storage_${lessonID}';
     const display = document.getElementById('c_${lessonID}');
-    
-    function refresh() {
-        display.innerText = localStorage.getItem(key) || '0';
-    }
-    
+    function refresh() { display.innerText = localStorage.getItem(key) || '0'; }
     document.getElementById('p_${lessonID}').onclick = function(e) {
         e.stopPropagation();
         let val = parseInt(localStorage.getItem(key)) || 0;
         localStorage.setItem(key, val + 1);
         refresh();
     };
-
     document.getElementById('m_${lessonID}').onclick = function(e) {
         e.stopPropagation();
         let val = parseInt(localStorage.getItem(key)) || 0;
-        if (val > 0) {
-            localStorage.setItem(key, val - 1);
-            refresh();
-        }
+        if (val > 0) { localStorage.setItem(key, val - 1); refresh(); }
     };
-
     document.getElementById('r_${lessonID}').onclick = function(e) {
         e.stopPropagation();
-        if (confirm('Обнулить результат?')) {
-            localStorage.setItem(key, 0);
-            refresh();
-        }
+        if (confirm('Обнулить результат?')) { localStorage.setItem(key, 0); refresh(); }
     };
-    
     refresh();
     window.addEventListener('storage', refresh);
     setTimeout(refresh, 300);
@@ -178,14 +182,13 @@ function update() {
     window.generatedCode = finalCode;
 }
 
-function copyCode() {
-    const el = document.createElement('textarea');
-    el.value = window.generatedCode;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    alert('Код скопирован! Теперь вставьте его в Genially.');
+function openModal() {
+    document.getElementById('modalCode').value = window.generatedCode;
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('modalOverlay').style.display = 'none';
 }
 
 update();
