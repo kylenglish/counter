@@ -5,15 +5,17 @@
     <title>Редактор виджета "Счетчик баллов"</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; gap: 20px; background: #f0f2f5; }
-        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 380px; }
-        .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e0e0e0; border: 2px dashed #bbb; border-radius: 12px; }
+        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 420px; height: fit-content; }
+        .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e0e0e0; border: 2px dashed #bbb; border-radius: 12px; min-height: 500px; }
         .field { margin-bottom: 15px; }
         label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #444; }
         input[type="text"], input[type="range"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; background: none; }
+        .hint { font-size: 11px; color: #666; font-weight: normal; line-height: 1.4; display: block; margin-top: 4px; }
         .copy-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
         h2 { font-size: 20px; margin-top: 0; color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bitter&family=Caveat&family=Comfortaa:wght@300..700&family=Marck+Script&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Stalinist+One&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -21,7 +23,13 @@
     <h2>Редактор виджета "Счетчик баллов"</h2>
     
     <div class="field">
-        <label>Что собираем (звездочки, рокеты, сердечки и т.п.)</label>
+        <label>Код (ID) презентации (опционально)</label>
+        <input type="text" id="idInput" value="my_cool_lesson" oninput="update()">
+        <span class="hint">Придумайте кодовое слово (напр. 'test1'), если хочешь использовать счетчик в разных презентациях отдельно.</span>
+    </div>
+
+    <div class="field">
+        <label>Что собираем (звездочки, рокеты и т.п.)</label>
         <input type="text" id="labelInput" value="Points" oninput="update()">
     </div>
 
@@ -30,36 +38,44 @@
         <input type="text" id="iconInput" placeholder="https://..." oninput="update()">
     </div>
 
-    <div class="field">
-        <label>Размер иконки: <span id="iconSizeVal">24</span>px</label>
-        <input type="range" id="iconSize" min="15" max="80" value="24" oninput="update()">
+    <div class="field" style="display:flex; gap:10px;">
+        <div style="flex:1">
+            <label>Иконка: <span id="iconSizeVal">24</span>px</label>
+            <input type="range" id="iconSize" min="15" max="80" value="24" oninput="update()">
+        </div>
+        <div style="flex:1">
+            <label>Текст: <span id="fontSizeVal">18</span>px</label>
+            <input type="range" id="fontSize" min="12" max="40" value="18" oninput="update()">
+        </div>
     </div>
 
     <div class="field">
-        <label>Размер шрифта: <span id="fontSizeVal">18</span>px</label>
-        <input type="range" id="fontSize" min="12" max="40" value="18" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Выбор шрифта</label>
+        <label>Выбор шрифта (из Genially)</label>
         <select id="fontSelect" onchange="update()">
-            <option value="Arial, sans-serif">Arial (Стандартный)</option>
-            <option value="'Montserrat', sans-serif">Montserrat (Genially)</option>
             <option value="'Roboto', sans-serif">Roboto</option>
-            <option value="'Courier New', monospace">Courier New</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="'Comic Sans MS', cursive">Comic Sans</option>
+            <option value="'Open Sans', sans-serif">Open Sans</option>
+            <option value="'Montserrat', sans-serif">Montserrat</option>
+            <option value="'Comfortaa', cursive">Comfortaa</option>
+            <option value="'Playfair Display', serif">Playfair Display</option>
+            <option value="'Raleway', sans-serif">Raleway</option>
+            <option value="'Ubuntu', sans-serif">Ubuntu</option>
+            <option value="'Bitter', serif">Bitter</option>
+            <option value="'Caveat', cursive">Caveat</option>
+            <option value="'Marck Script', cursive">Marck Script</option>
+            <option value="'Bad Script', cursive">Bad Script</option>
+            <option value="'Stalinist One', cursive">Stalinist One</option>
         </select>
     </div>
 
-    <div class="field">
-        <label>Цвет фона</label>
-        <input type="color" id="bgColor" value="#ffffff" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Цвет текста и кнопок</label>
-        <input type="color" id="textColor" value="#333333" oninput="update()">
+    <div class="field" style="display:flex; gap:10px;">
+        <div style="flex:1">
+            <label>Цвет фона</label>
+            <input type="color" id="bgColor" value="#ffffff" oninput="update()">
+        </div>
+        <div style="flex:1">
+            <label>Цвет текста</label>
+            <input type="color" id="textColor" value="#333333" oninput="update()">
+        </div>
     </div>
 
     <button onclick="copyCode()" class="copy-btn">📋 Копировать код для Genially</button>
@@ -72,6 +88,7 @@
 
 <script>
 function update() {
+    const lessonID = document.getElementById('idInput').value.replace(/[^a-z0-9]/gi, '_') || 'default';
     const label = document.getElementById('labelInput').value;
     const iconUrl = document.getElementById('iconInput').value;
     const iSize = document.getElementById('iconSize').value;
@@ -88,59 +105,47 @@ function update() {
         : `<span style="font-size:${iSize}px; margin-right:10px; vertical-align: middle;">⭐</span>`;
 
     const finalCode = `
-<div id="wrapper" style="display: inline-block; user-select: none; vertical-align: middle;">
+<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bitter&family=Caveat&family=Comfortaa&family=Marck+Script&family=Montserrat&family=Open+Sans&family=Playfair+Display&family=Raleway&family=Roboto&family=Stalinist+One&family=Ubuntu&display=swap" rel="stylesheet">
+<div id="w_${lessonID}" style="display: inline-block; user-select: none; vertical-align: middle;">
     <div style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: ${font}; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.2);">
         ${iconHtml}
         <span style="font-size: ${fSize}px; font-weight: bold; vertical-align: middle; line-height: 1; margin-right: 15px;">
-            ${label}: <span id="count">0</span>
+            ${label}: <span id="c_${lessonID}">0</span>
         </span>
-        
         <div style="display: flex; gap: 8px; align-items: center;">
-            <div id="minus_btn" style="background:${text}22; color:${text}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">−</div>
-            <div id="plus_btn" style="background:${text}; color:${bg}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">+</div>
-            <div id="reset_btn" style="margin-left:5px; cursor:pointer; opacity: 0.6; font-size: 18px;" title="Сбросить">🗑️</div>
+            <div id="m_${lessonID}" style="background:${text}22; color:${text}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">−</div>
+            <div id="p_${lessonID}" style="background:${text}; color:${bg}; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1;">+</div>
+            <div id="r_${lessonID}" style="margin-left:5px; cursor:pointer; opacity: 0.6; font-size: 18px;" title="Сбросить">🗑️</div>
         </div>
     </div>
 </div>
 
 <script>
 (function() {
-    const key = 'genially_val_sum';
-    const display = document.getElementById('count');
-    const bPlus = document.getElementById('plus_btn');
-    const bMinus = document.getElementById('minus_btn');
-    const bReset = document.getElementById('reset_btn');
+    const key = 'gen_storage_${lessonID}';
+    const display = document.getElementById('c_${lessonID}');
     
     function refresh() {
         display.innerText = localStorage.getItem(key) || '0';
     }
     
-    function animate(el) {
-        el.style.transform = 'scale(1.2)';
-        setTimeout(() => el.style.transform = 'scale(1)', 100);
-    }
-
-    bPlus.onclick = function(e) {
+    document.getElementById('p_${lessonID}').onclick = function(e) {
         e.stopPropagation();
         let val = parseInt(localStorage.getItem(key)) || 0;
-        val++;
-        localStorage.setItem(key, val);
+        localStorage.setItem(key, val + 1);
         refresh();
-        animate(bPlus);
     };
 
-    bMinus.onclick = function(e) {
+    document.getElementById('m_${lessonID}').onclick = function(e) {
         e.stopPropagation();
         let val = parseInt(localStorage.getItem(key)) || 0;
         if (val > 0) {
-            val--;
-            localStorage.setItem(key, val);
+            localStorage.setItem(key, val - 1);
             refresh();
-            animate(bMinus);
         }
     };
 
-    bReset.onclick = function(e) {
+    document.getElementById('r_${lessonID}').onclick = function(e) {
         e.stopPropagation();
         if (confirm('Обнулить результат?')) {
             localStorage.setItem(key, 0);
@@ -165,7 +170,7 @@ function copyCode() {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    alert('Код скопирован! Теперь вставьте его в Genially (Insert -> Others)');
+    alert('Код скопирован! Вставьте его в Genially.');
 }
 
 update();
