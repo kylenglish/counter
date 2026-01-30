@@ -1,124 +1,32 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Конструктор счетчика для Genially</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; display: flex; gap: 30px; background: #f0f2f5; color: #333; }
-        .editor { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 380px; height: fit-content; }
-        .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ddd; border: 2px dashed #bbb; border-radius: 15px; min-height: 400px; }
-        .field { margin-bottom: 15px; }
-        label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 600; color: #555; }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        input[type="color"] { width: 100%; height: 40px; border: none; cursor: pointer; background: none; }
-        .range-group { display: flex; align-items: center; gap: 10px; }
-        input[type="range"] { flex-grow: 1; }
-        h2 { margin-top: 0; font-size: 20px; color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
-        .copy-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; transition: 0.3s; }
-        .copy-btn:hover { background: #218838; }
-        .reset-btn { width: 100%; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-size: 13px; }
-    </style>
-</head>
-<body>
-
-<div class="editor">
-    <h2>Настройка виджета</h2>
-    
-    <div class="field">
-        <label>Что собираем? (напр. Баллы, Звезды)</label>
-        <input type="text" id="labelInput" value="Artifacts" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Ссылка на иконку (пусто — будет ⭐)</label>
-        <input type="text" id="iconInput" placeholder="https://ссылка-на-картинку.png" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Размер иконки: <span id="iconSizeVal">24</span>px</label>
-        <input type="range" id="iconSize" min="10" max="100" value="24" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Размер шрифта: <span id="fontSizeVal">18</span>px</label>
-        <input type="range" id="fontSize" min="10" max="50" value="18" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Цвет фона (пипетка)</label>
-        <input type="color" id="bgColor" value="#ffffff" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Цвет текста (пипетка)</label>
-        <input type="color" id="textColor" value="#333333" oninput="update()">
-    </div>
-
-    <div class="field">
-        <label>Название шрифта (из Genially)</label>
-        <input type="text" id="fontInput" value="Montserrat" oninput="update()">
-    </div>
-
-    <button onclick="copyToClipboard()" class="copy-btn">📋 Копировать код для Genially</button>
-    <button onclick="location.reload()" class="reset-btn">Сбросить настройки</button>
-</div>
-
-<div class="preview-zone">
-    <h3 style="color: #666;">Предпросмотр:</h3>
-    <div id="final-widget-preview"></div>
-</div>
-
 <script>
-function update() {
-    const label = document.getElementById('labelInput').value;
-    const iconUrl = document.getElementById('iconInput').value;
-    const iconSize = document.getElementById('iconSize').value;
-    const fontSize = document.getElementById('fontSize').value;
-    const bg = document.getElementById('bgColor').value;
-    const text = document.getElementById('textColor').value;
-    const font = document.getElementById('fontInput').value;
-
-    document.getElementById('iconSizeVal').innerText = iconSize;
-    document.getElementById('fontSizeVal').innerText = fontSize;
-
-    const iconHtml = iconUrl 
-        ? `<img src="${iconUrl}" style="width:${iconSize}px; height:auto; margin-right:10px; vertical-align: middle;">` 
-        : `<span style="font-size:${iconSize}px; margin-right:10px; vertical-align: middle;">⭐</span>`;
-
-    const finalHtml = `
-<div id="genially-tracker" style="display: inline-flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: '${font}', sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.1);">
-    ${iconHtml}
-    <span style="font-size: ${fontSize}px; font-weight: bold; vertical-align: middle;">${label}: <span id="score_val">0</span></span>
-    <button onclick="addScore()" style="margin-left:15px; background:rgba(0,0,0,0.1); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; color:${text}; font-weight:bold; font-size: 20px; line-height: 1;">+</button>
-</div>
-
-<script>
+    // Используем уникальный ключ, чтобы не было конфликтов
+    var storageKey = 'eng_class_points';
     var display = document.getElementById('score_val');
-    var score = localStorage.getItem('genially_score_total') || 0;
-    display.innerText = score;
-    function addScore() {
-        score++;
-        display.innerText = score;
-        localStorage.setItem('genially_score_total', score);
+    
+    // Функция обновления цифры на экране
+    function refreshDisplay() {
+        var savedScore = localStorage.getItem(storageKey) || 0;
+        display.innerText = savedScore;
     }
-<\/script>`;
 
-    document.getElementById('final-widget-preview').innerHTML = finalHtml;
-    window.lastGeneratedCode = finalHtml;
-}
+    // Запускаем при загрузке
+    refreshDisplay();
 
-function copyToClipboard() {
-    const el = document.createElement('textarea');
-    el.value = window.lastGeneratedCode;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    alert('Код скопирован! Теперь вставьте его в Genially (Insert -> Others)');
-}
-
-update();
-</script>
-
-</body>
-</html>
+    function addScore() {
+        // Читаем актуальное значение прямо из памяти
+        var current = parseInt(localStorage.getItem(storageKey)) || 0;
+        current++;
+        // Сохраняем
+        localStorage.setItem(storageKey, current);
+        // Обновляем экран
+        refreshDisplay();
+        
+        // Визуальный эффект нажатия (пульсация)
+        var btn = document.getElementById('genially-tracker');
+        btn.style.transform = 'scale(1.1)';
+        setTimeout(function(){ btn.style.transform = 'scale(1)'; }, 100);
+    }
+    
+    // Проверка обновлений (если открыто несколько окон)
+    window.addEventListener('storage', refreshDisplay);
+<\/script>
