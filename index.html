@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Genially Score Widget Creator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; display: flex; gap: 40px; background: #f4f4f9; }
+        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
+        .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e0e0e0; border-radius: 12px; min-height: 300px; position: relative; }
+        .field { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .code-output { margin-top: 20px; width: 100%; height: 100px; font-family: monospace; font-size: 10px; }
+        h2 { margin-top: 0; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="editor">
+    <h2>Widget Configurator</h2>
+    
+    <div class="field">
+        <label>What are we collecting? (e.g. Points, Stars)</label>
+        <input type="text" id="labelInput" value="Points" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Icon URL (Leave empty for default ⭐)</label>
+        <input type="text" id="iconInput" placeholder="https://cdn-icons-png..." oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Background Color</label>
+        <input type="color" id="bgColor" value="#ffffff" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Text Color</label>
+        <input type="color" id="textColor" value="#333333" oninput="update()">
+    </div>
+
+    <div class="field">
+        <label>Font Name (Copy from Genially)</label>
+        <input type="text" id="fontInput" value="Montserrat" oninput="update()">
+    </div>
+
+    <button onclick="copyToClipboard()" style="width:100%; padding:10px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer;">Copy Final Code for Genially</button>
+</div>
+
+<div class="preview-zone">
+    <h3>Live Preview</h3>
+    <div id="final-widget-preview"></div>
+    <p style="font-size: 11px; color: #666; margin-top: 20px;">This is how it will look in your presentation</p>
+</div>
+
+<script>
+function update() {
+    const label = document.getElementById('labelInput').value;
+    const iconUrl = document.getElementById('iconInput').value;
+    const bg = document.getElementById('bgColor').value;
+    const text = document.getElementById('textColor').value;
+    const font = document.getElementById('fontInput').value;
+
+    const iconHtml = iconUrl ? `<img src="${iconUrl}" style="width:24px; height:24px; margin-right:10px;">` : `<span style="font-size:24px; margin-right:10px;">⭐</span>`;
+
+    const finalHtml = `
+<div id="genially-tracker" style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: '${font}', sans-serif; width: fit-content; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.1);">
+    ${iconHtml}
+    <span style="font-size: 18px; font-weight: bold;">${label}: <span id="val">0</span></span>
+    <button onclick="add()" style="margin-left:15px; background:rgba(0,0,0,0.1); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; color:${text}; font-weight:bold;">+</button>
+</div>
+
+<script>
+    var v = document.getElementById('val');
+    var s = localStorage.getItem('g_score') || 0;
+    v.innerText = s;
+    function add() {
+        s++;
+        v.innerText = s;
+        localStorage.setItem('g_score', s);
+    }
+<\/script>`;
+
+    document.getElementById('final-widget-preview').innerHTML = finalHtml;
+    window.lastGeneratedCode = finalHtml;
+}
+
+function copyToClipboard() {
+    const el = document.createElement('textarea');
+    el.value = window.lastGeneratedCode;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    alert('Code copied! Now go to Genially -> Insert -> Others and paste it.');
+}
+
+update();
+</script>
+
+</body>
+</html>
