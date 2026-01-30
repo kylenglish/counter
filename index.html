@@ -2,27 +2,27 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Конструктор счетчика Genially</title>
+    <title>Редактор виджета "Счетчик баллов"</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; gap: 20px; background: #f0f2f5; }
-        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; }
+        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 380px; }
         .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e0e0e0; border: 2px dashed #bbb; border-radius: 12px; }
-        .field { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: bold; color: #444; }
-        input[type="text"], input[type="range"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .field { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #444; }
+        input[type="text"], input[type="range"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; background: none; }
-        .copy-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        h2 { font-size: 18px; margin-top: 0; color: #1a73e8; }
+        .copy-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        h2 { font-size: 20px; margin-top: 0; color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="editor">
-    <h2>Настройка виджета</h2>
+    <h2>Редактор виджета "Счетчик баллов"</h2>
     
     <div class="field">
-        <label>Название (напр. Points, Словарный запас)</label>
-        <input type="text" id="labelInput" value="Score" oninput="update()">
+        <label>Что собираем (звездочки, рокеты, сердечки и т.п.)</label>
+        <input type="text" id="labelInput" value="Points" oninput="update()">
     </div>
 
     <div class="field">
@@ -41,6 +41,19 @@
     </div>
 
     <div class="field">
+        <label>Выбор шрифта</label>
+        <select id="fontSelect" onchange="update()">
+            <option value="Arial, sans-serif">Arial (Стандартный)</option>
+            <option value="'Montserrat', sans-serif">Montserrat (Genially)</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <option value="'Courier New', monospace">Courier New (Печатная машинка)</option>
+            <option value="Georgia, serif">Georgia (С засечками)</option>
+            <option value="'Comic Sans MS', cursive">Comic Sans (Игровой)</option>
+            <option value="'Verdana', sans-serif">Verdana</option>
+        </select>
+    </div>
+
+    <div class="field">
         <label>Цвет фона</label>
         <input type="color" id="bgColor" value="#ffffff" oninput="update()">
     </div>
@@ -50,16 +63,11 @@
         <input type="color" id="textColor" value="#333333" oninput="update()">
     </div>
 
-    <div class="field">
-        <label>Шрифт (как в Genially)</label>
-        <input type="text" id="fontInput" value="Arial" oninput="update()">
-    </div>
-
-    <button onclick="copyCode()" class="copy-btn">📋 Копировать код</button>
+    <button onclick="copyCode()" class="copy-btn">📋 Копировать код для Genially</button>
 </div>
 
 <div class="preview-zone">
-    <h3>Предпросмотр:</h3>
+    <h3 style="color: #666;">Предпросмотр:</h3>
     <div id="preview-container"></div>
 </div>
 
@@ -71,22 +79,21 @@ function update() {
     const fSize = document.getElementById('fontSize').value;
     const bg = document.getElementById('bgColor').value;
     const text = document.getElementById('textColor').value;
-    const font = document.getElementById('fontInput').value;
+    const font = document.getElementById('fontSelect').value;
 
     document.getElementById('iconSizeVal').innerText = iSize;
     document.getElementById('fontSizeVal').innerText = fSize;
 
     const iconHtml = iconUrl 
-        ? `<img src="${iconUrl}" style="width:${iSize}px; height:auto; margin-right:10px;">` 
-        : `<span style="font-size:${iSize}px; margin-right:10px;">⭐</span>`;
+        ? `<img src="${iconUrl}" style="width:${iSize}px; height:auto; margin-right:10px; vertical-align: middle;">` 
+        : `<span style="font-size:${iSize}px; margin-right:10px; vertical-align: middle;">⭐</span>`;
 
-    // Генерируем финальный код для Genially
     const finalCode = `
-<div id="wrapper" style="display: inline-block; user-select: none;">
-    <div style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: '${font}', sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.1);">
+<div id="wrapper" style="display: inline-block; user-select: none; vertical-align: middle;">
+    <div style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: ${font}; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.2);">
         ${iconHtml}
-        <span style="font-size: ${fSize}px; font-weight: bold;">${label}: <span id="count">0</span></span>
-        <div id="plus_btn" style="margin-left:15px; background:${text}; color:${bg}; border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; opacity: 0.8;">+</div>
+        <span style="font-size: ${fSize}px; font-weight: bold; vertical-align: middle; line-height: 1;">${label}: <span id="count">0</span></span>
+        <div id="plus_btn" style="margin-left:15px; background:${text}; color:${bg}; border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; line-height: 1; transition: transform 0.1s;">+</div>
     </div>
 </div>
 
@@ -106,6 +113,8 @@ function update() {
         val++;
         localStorage.setItem(key, val);
         refresh();
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = 'scale(1)', 100);
     };
     
     refresh();
@@ -125,7 +134,7 @@ function copyCode() {
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    alert('Код готов! Вставляйте в Genially (Insert -> Others)');
+    alert('Код скопирован! Теперь вставьте его в Genially (Insert -> Others)');
 }
 
 update();
