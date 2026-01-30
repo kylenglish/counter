@@ -1,105 +1,43 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Редактор счётчика баллов для Genially</title>
-
-<style>
-body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background:#f0f2f5;
-    padding:20px;
-    display:flex;
-    gap:30px;
-}
-
-.editor {
-    width:380px;
-    background:#fff;
-    padding:25px;
-    border-radius:15px;
-    box-shadow:0 8px 20px rgba(0,0,0,.1);
-}
-
-.preview-zone {
-    flex:1;
-    background:#ddd;
-    border-radius:15px;
-    border:2px dashed #bbb;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-}
-
-.field {
-    margin-bottom:15px;
-}
-
-label {
-    display:block;
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:5px;
-}
-
-input[type="text"],
-input[type="range"],
-input[type="color"] {
-    width:100%;
-}
-
-h2 {
-    margin-top:0;
-    color:#1a73e8;
-}
-
-button {
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.copy-btn {
-    background:#28a745;
-    color:#fff;
-    margin-top:10px;
-}
-
-.reset-btn {
-    background:#6c757d;
-    color:#fff;
-    margin-top:8px;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Конструктор счетчика Genially</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; gap: 20px; background: #f0f2f5; }
+        .editor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; }
+        .preview-zone { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e0e0e0; border: 2px dashed #bbb; border-radius: 12px; }
+        .field { margin-bottom: 12px; }
+        label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: bold; color: #444; }
+        input[type="text"], input[type="range"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; background: none; }
+        .copy-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        h2 { font-size: 18px; margin-top: 0; color: #1a73e8; }
+    </style>
 </head>
-
 <body>
 
 <div class="editor">
-    <h2>Счётчик баллов</h2>
-
+    <h2>Настройка виджета</h2>
+    
     <div class="field">
-        <label>Название (что собираем)</label>
-        <input type="text" id="labelInput" value="Баллы" oninput="update()">
+        <label>Название (напр. Points, Словарный запас)</label>
+        <input type="text" id="labelInput" value="Score" oninput="update()">
     </div>
 
     <div class="field">
-        <label>Ссылка на иконку (необязательно)</label>
+        <label>Ссылка на иконку (пусто = ⭐)</label>
         <input type="text" id="iconInput" placeholder="https://..." oninput="update()">
     </div>
 
     <div class="field">
-        <label>Размер иконки: <span id="iconSizeVal">24</span> px</label>
-        <input type="range" id="iconSize" min="10" max="100" value="24" oninput="update()">
+        <label>Размер иконки: <span id="iconSizeVal">24</span>px</label>
+        <input type="range" id="iconSize" min="15" max="80" value="24" oninput="update()">
     </div>
 
     <div class="field">
-        <label>Размер текста: <span id="fontSizeVal">18</span> px</label>
-        <input type="range" id="fontSize" min="10" max="50" value="18" oninput="update()">
+        <label>Размер шрифта: <span id="fontSizeVal">18</span>px</label>
+        <input type="range" id="fontSize" min="12" max="40" value="18" oninput="update()">
     </div>
 
     <div class="field">
@@ -113,96 +51,84 @@ button {
     </div>
 
     <div class="field">
-        <label>Шрифт (из Genially)</label>
-        <input type="text" id="fontInput" value="Montserrat" oninput="update()">
+        <label>Шрифт (как в Genially)</label>
+        <input type="text" id="fontInput" value="Arial" oninput="update()">
     </div>
 
-    <button class="copy-btn" onclick="copyCode()">📋 Копировать код для Genially</button>
-    <button class="reset-btn" onclick="location.reload()">Сбросить настройки</button>
+    <button onclick="copyCode()" class="copy-btn">📋 Копировать код</button>
 </div>
 
 <div class="preview-zone">
-    <h3 style="color:#666;">Предпросмотр</h3>
-    <div id="preview"></div>
+    <h3>Предпросмотр:</h3>
+    <div id="preview-container"></div>
 </div>
 
 <script>
 function update() {
+    const label = document.getElementById('labelInput').value;
+    const iconUrl = document.getElementById('iconInput').value;
+    const iSize = document.getElementById('iconSize').value;
+    const fSize = document.getElementById('fontSize').value;
+    const bg = document.getElementById('bgColor').value;
+    const text = document.getElementById('textColor').value;
+    const font = document.getElementById('fontInput').value;
 
-    const label = labelInput.value;
-    const iconUrl = iconInput.value;
-    const iconSize = iconSize.value;
-    const fontSize = fontSize.value;
-    const bg = bgColor.value;
-    const text = textColor.value;
-    const font = fontInput.value;
+    document.getElementById('iconSizeVal').innerText = iSize;
+    document.getElementById('fontSizeVal').innerText = fSize;
 
-    iconSizeVal.innerText = iconSize;
-    fontSizeVal.innerText = fontSize;
+    const iconHtml = iconUrl 
+        ? `<img src="${iconUrl}" style="width:${iSize}px; height:auto; margin-right:10px;">` 
+        : `<span style="font-size:${iSize}px; margin-right:10px;">⭐</span>`;
 
-    const icon = iconUrl
-        ? `<img src="${iconUrl}" style="width:${iconSize}px;margin-right:10px;">`
-        : `<span style="font-size:${iconSize}px;margin-right:10px;">🏆</span>`;
-
-    const widget = `
-<div style="
-    display:inline-flex;
-    align-items:center;
-    background:${bg};
-    color:${text};
-    border-radius:50px;
-    padding:10px 20px;
-    font-family:'${font}',sans-serif;
-    box-shadow:0 4px 15px rgba(0,0,0,.1);">
-
-    ${icon}
-
-    <span style="font-size:${fontSize}px;font-weight:bold;">
-        ${label}: <span id="score_val">0</span>
-    </span>
-
-    <button onclick="addScore()" style="
-        margin-left:15px;
-        width:30px;
-        height:30px;
-        border:none;
-        border-radius:50%;
-        font-size:20px;
-        font-weight:bold;
-        cursor:pointer;
-        background:rgba(0,0,0,.1);
-        color:${text};">+</button>
+    // Генерируем финальный код для Genially
+    const finalCode = `
+<div id="wrapper" style="display: inline-block; user-select: none;">
+    <div style="display: flex; align-items: center; background: ${bg}; color: ${text}; border-radius: 50px; padding: 10px 20px; font-family: '${font}', sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.1);">
+        ${iconHtml}
+        <span style="font-size: ${fSize}px; font-weight: bold;">${label}: <span id="count">0</span></span>
+        <div id="plus_btn" style="margin-left:15px; background:${text}; color:${bg}; border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px; opacity: 0.8;">+</div>
+    </div>
 </div>
 
 <script>
-const KEY = 'genially_global_score';
-let score = parseInt(localStorage.getItem(KEY)) || 0;
-document.getElementById('score_val').innerText = score;
+(function() {
+    const key = 'genially_val_sum';
+    const display = document.getElementById('count');
+    const btn = document.getElementById('plus_btn');
+    
+    function refresh() {
+        display.innerText = localStorage.getItem(key) || '0';
+    }
+    
+    btn.onclick = function(e) {
+        e.stopPropagation();
+        let val = parseInt(localStorage.getItem(key)) || 0;
+        val++;
+        localStorage.setItem(key, val);
+        refresh();
+    };
+    
+    refresh();
+    window.addEventListener('storage', refresh);
+    setTimeout(refresh, 300);
+})();
+<\/script>`;
 
-function addScore() {
-    score++;
-    localStorage.setItem(KEY, score);
-    document.getElementById('score_val').innerText = score;
-}
-<\/script>
-`;
-
-    preview.innerHTML = widget;
-    window.geniallyCode = widget;
+    document.getElementById('preview-container').innerHTML = finalCode;
+    window.generatedCode = finalCode;
 }
 
 function copyCode() {
-    const t = document.createElement('textarea');
-    t.value = window.geniallyCode;
-    document.body.appendChild(t);
-    t.select();
+    const el = document.createElement('textarea');
+    el.value = window.generatedCode;
+    document.body.appendChild(el);
+    el.select();
     document.execCommand('copy');
-    document.body.removeChild(t);
-    alert('Код скопирован. Вставь его в Genially → Insert → Others');
+    document.body.removeChild(el);
+    alert('Код готов! Вставляйте в Genially (Insert -> Others)');
 }
 
 update();
 </script>
-
 </body>
 </html>
