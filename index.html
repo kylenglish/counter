@@ -11,7 +11,8 @@
         label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #444; }
         
         .id-container { display: flex; gap: 8px; }
-        .refresh-id-btn { background: #1a73e8; color: white; border: none; border-radius: 6px; padding: 0 10px; cursor: pointer; font-size: 16px; }
+        .refresh-id-btn { background: #1a73e8; color: white; border: none; border-radius: 6px; padding: 0 10px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .refresh-id-btn:hover { background: #1557b0; }
         
         input[type="text"], input[type="range"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; background: none; }
@@ -40,18 +41,19 @@
     <h2>Редактор виджета "Счетчик баллов"</h2>
     
     <div class="field">
-        <label>Код (ID) презентации (опционально)</label>
+        <label>Код (ID) презентации</label>
         <div class="id-container">
-            <input type="text" id="idInput" oninput="update()">
+            <input type="text" id="idInput" readonly oninput="update()">
             <button class="refresh-id-btn" onclick="generateNewID()" title="Создать новый ID">🔄</button>
         </div>
         <div class="hint">
-            <span class="hint-title">ID создается автоматически. Не меняйте его, если хотите новый независимый счетчик.</span>
+            <span class="hint-title">ID создается автоматически, ничего менять не нужно. Если хотите использовать настроенный счетчик сразу в нескольких презентациях, то следуйте инструкции.</span>
             <strong>Инструкция:</strong>
             <span class="hint-step">настраиваете параметры;</span>
-            <span class="hint-step">копируете код для одной презентации;</span>
-            <span class="hint-step">вставляете в презентацию;</span>
-            <span class="hint-step">для другой презентации нажмите 🔄, чтобы получить новый ID.</span>
+            <span class="hint-step">копируете код для одной презентации, не закрывая редактор;</span>
+            <span class="hint-step">вставляете код в презентацию;</span>
+            <span class="hint-step">возвращаетесь в редактор и нажимаете 🔄, чтобы получить новый ID;</span>
+            <span class="hint-step">копируете код для другой презентации и вставляете его.</span>
         </div>
     </div>
 
